@@ -1,0 +1,16 @@
+{
+  "fields": [
+    {
+      "text": "测试字段1",
+      "mode": "text"
+    },
+    {
+      "text": "\\d+",
+      "mode": "regex"
+    },
+    {
+      "text": "另一个测试字段",
+      "mode": "text"
+    }
+  ]
+}

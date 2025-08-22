@@ -11,9 +11,11 @@
 """
 
 import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
+from tkinter import ttk, scrolledtext, messagebox, filedialog
 import sys
 import re
+import json
+import os
 
 
 # ============================== 常量配置 ==============================
@@ -29,6 +31,9 @@ class Config:
     CLIPBOARD_POLL_MS = 500
     MAX_FIELDS = 20
     MIN_FIELDS = 1
+
+    # 配置文件路径
+    CONFIG_FILE = "fields_config.json"
 
 
 class MainGUI:
@@ -132,27 +137,30 @@ class MainGUI:
         self.submit_button = ttk.Button(
             self.left_frame, text="保存字段", command=self._handle_save_click
         )
-        self.submit_button.grid(row=4, column=0, sticky=tk.W)
+        self.submit_button.grid(row=5, column=0, sticky=tk.W)
 
         # 分隔线
         ttk.Separator(self.left_frame, orient=tk.HORIZONTAL).grid(
-            row=5, column=0, sticky=(tk.E, tk.W), pady=(10, 10)
+            row=6, column=0, sticky=(tk.E, tk.W), pady=(10, 10)
         )
 
         # 保存字段显示区域
         ttk.Label(self.left_frame, text="当前保存的字段").grid(
-            row=6, column=0, sticky=tk.W, pady=(0, 6)
+            row=7, column=0, sticky=tk.W, pady=(0, 6)
         )
 
         # 保存字段显示区域（可滚动）
         saved_section, self.saved_container = self._create_scrollable_area(
             self.left_frame, height=Config.LEFT_SAVED_SECTION_HEIGHT
         )
-        saved_section.grid(row=7, column=0, sticky=(tk.W, tk.E))
+        saved_section.grid(row=8, column=0, sticky=(tk.W, tk.E))
         self.saved_container.columnconfigure(0, weight=1)
 
         # 初始化至少一个字段
         self._add_field()
+
+        # 加载保存的配置
+        self._load_saved_config()
 
     def _create_field_controls(self):
         """创建字段控制区域"""
@@ -171,10 +179,28 @@ class MainGUI:
             row=0, column=1, sticky=tk.W, padx=(10, 0)
         )
 
+        # 导入导出按钮区域
+        import_export_frame = ttk.Frame(self.left_frame)
+        import_export_frame.grid(
+            row=3, column=0, sticky=(tk.W, tk.E), pady=(6, 6)
+        )
+
+        # 导入字段按钮
+        self.import_btn = ttk.Button(
+            import_export_frame, text="导入字段", command=self._import_fields
+        )
+        self.import_btn.grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+
+        # 导出字段按钮
+        self.export_btn = ttk.Button(
+            import_export_frame, text="导出字段", command=self._export_fields
+        )
+        self.export_btn.grid(row=0, column=1, sticky=tk.W)
+
     def _create_match_mode_selection(self):
         """创建匹配模式选择区域"""
         match_mode_frame = ttk.Frame(self.left_frame)
-        match_mode_frame.grid(row=3, column=0, sticky=tk.W, pady=(6, 6))
+        match_mode_frame.grid(row=4, column=0, sticky=tk.W, pady=(6, 6))
 
         ttk.Label(match_mode_frame, text="匹配策略：").grid(
             row=0, column=0, sticky=tk.W
@@ -369,6 +395,185 @@ class MainGUI:
         self._reflow_fields()
         self._reflow_saved_display()
         self._update_controls()
+
+    def _import_fields(self):
+        """导入字段配置"""
+        try:
+            # 打开文件选择对话框
+            filename = filedialog.askopenfilename(
+                title="选择要导入的字段配置文件",
+                filetypes=[("JSON文件", "*.json"), ("所有文件", "*.*")],
+            )
+
+            if not filename:
+                return
+
+            # 读取JSON文件
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            # 验证数据格式
+            if not isinstance(data, dict) or 'fields' not in data:
+                messagebox.showerror("错误", "文件格式不正确，缺少fields字段")
+                return
+
+            fields_data = data['fields']
+            if not isinstance(fields_data, list):
+                messagebox.showerror("错误", "fields字段必须是数组格式")
+                return
+
+            # 清空现有字段
+            self.fields.clear()
+            self.saved_display_vars.clear()
+
+            # 导入字段数据
+            for field_data in fields_data:
+                if (
+                    isinstance(field_data, dict)
+                    and 'text' in field_data
+                    and 'mode' in field_data
+                ):
+                    text_var = tk.StringVar(value=field_data['text'])
+                    mode_var = tk.StringVar(value=field_data['mode'])
+                    self.fields.append({"text": text_var, "mode": mode_var})
+
+                    # 创建对应的保存显示变量
+                    mode_label = self._get_mode_label(mode_var.get())
+                    display_text = (
+                        field_data['text'] if field_data['text'] else '（空）'
+                    )
+                    self.saved_display_vars.append(
+                        tk.StringVar(
+                            value=f"字段{len(self.fields)}（{mode_label}）: "
+                            f"{display_text}"
+                        )
+                    )
+
+            # 如果没有字段，至少添加一个
+            if not self.fields:
+                self._add_field()
+
+            # 重新渲染界面
+            self._reflow_fields()
+            self._reflow_saved_display()
+            self._update_controls()
+
+            messagebox.showinfo("成功", f"成功导入 {len(self.fields)} 个字段")
+
+        except Exception as e:
+            messagebox.showerror("错误", f"导入失败: {str(e)}")
+
+    def _export_fields(self):
+        """导出字段配置"""
+        try:
+            # 打开文件保存对话框
+            filename = filedialog.asksaveasfilename(
+                title="保存字段配置文件",
+                defaultextension=".json",
+                filetypes=[("JSON文件", "*.json"), ("所有文件", "*.*")],
+            )
+
+            if not filename:
+                return
+
+            # 准备导出数据
+            export_data = {"fields": []}
+
+            for field in self.fields:
+                export_data["fields"].append(
+                    {"text": field["text"].get(), "mode": field["mode"].get()}
+                )
+
+            # 写入JSON文件
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(export_data, f, ensure_ascii=False, indent=2)
+
+            messagebox.showinfo(
+                "成功", f"成功导出 {len(self.fields)} 个字段到 {filename}"
+            )
+
+        except Exception as e:
+            messagebox.showerror("错误", f"导出失败: {str(e)}")
+
+    def _load_saved_config(self):
+        """加载保存的字段配置"""
+        try:
+            if os.path.exists(Config.CONFIG_FILE):
+                with open(Config.CONFIG_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                if isinstance(data, dict) and 'fields' in data:
+                    fields_data = data['fields']
+                    if isinstance(fields_data, list):
+                        # 清空现有字段
+                        self.fields.clear()
+                        self.saved_display_vars.clear()
+
+                        # 加载字段数据
+                        for field_data in fields_data:
+                            if (
+                                isinstance(field_data, dict)
+                                and 'text' in field_data
+                                and 'mode' in field_data
+                            ):
+                                text_var = tk.StringVar(
+                                    value=field_data['text']
+                                )
+                                mode_var = tk.StringVar(
+                                    value=field_data['mode']
+                                )
+                                self.fields.append(
+                                    {"text": text_var, "mode": mode_var}
+                                )
+
+                                # 创建对应的保存显示变量
+                                mode_label = self._get_mode_label(
+                                    mode_var.get()
+                                )
+                                display_text = (
+                                    field_data['text']
+                                    if field_data['text']
+                                    else '（空）'
+                                )
+                                self.saved_display_vars.append(
+                                    tk.StringVar(
+                                        value=f"字段{len(self.fields)}（{mode_label}）: "
+                                        f"{display_text}"
+                                    )
+                                )
+
+                        # 如果没有字段，至少添加一个
+                        if not self.fields:
+                            self._add_field()
+
+                        # 重新渲染界面
+                        self._reflow_fields()
+                        self._reflow_saved_display()
+                        self._update_controls()
+
+        except Exception as e:
+            # 如果加载失败，至少添加一个默认字段
+            if not self.fields:
+                self._add_field()
+
+    def _save_config_to_file(self):
+        """保存字段配置到文件"""
+        try:
+            # 准备保存数据
+            save_data = {"fields": []}
+
+            for field in self.fields:
+                save_data["fields"].append(
+                    {"text": field["text"].get(), "mode": field["mode"].get()}
+                )
+
+            # 写入配置文件
+            with open(Config.CONFIG_FILE, 'w', encoding='utf-8') as f:
+                json.dump(save_data, f, ensure_ascii=False, indent=2)
+
+        except Exception as e:
+            # 保存失败时不显示错误，避免影响用户体验
+            pass
 
     def _remove_field(self, index):
         """删除指定索引的检测字段
@@ -760,30 +965,53 @@ class MainGUI:
         """
         matches = []
 
+        # 调试输出
+        print(f"=== 开始匹配检测 ===")
+        print(f"剪贴板内容: {repr(clipboard_text)}")
+        print(f"保存字段数量: {len(self.saved_display_vars)}")
+
         for idx, var in enumerate(self.saved_display_vars):
             base = self._strip_match_suffix(var.get())
             mode_label, value = self._extract_mode_and_value(base)
 
+            # 调试输出
+            print(f"字段{idx + 1}: 原始文本='{var.get()}'")
+            print(f"字段{idx + 1}: 清理后='{base}'")
+            print(f"字段{idx + 1}: 模式='{mode_label}', 值='{value}'")
+
             # 跳过空值
             if not value or value == "（空）":
+                print(f"字段{idx + 1}: 跳过空值")
                 continue
 
             # 根据模式进行匹配
             if mode_label == "文本":
                 # 纯文本匹配
+                print(f"字段{idx + 1}: 进行纯文本匹配")
                 if value in clipboard_text:
+                    print(f"字段{idx + 1}: 纯文本匹配成功")
                     matches.append((idx, mode_label, value))
+                else:
+                    print(f"字段{idx + 1}: 纯文本匹配失败")
             else:
                 # 正则表达式匹配
+                print(f"字段{idx + 1}: 进行正则表达式匹配")
                 try:
+                    print(
+                        f"字段{idx + 1}: 尝试匹配正则 '{value}' 到 '{clipboard_text}'"
+                    )
                     if re.search(
                         value, clipboard_text, re.DOTALL | re.MULTILINE
                     ):
+                        print(f"字段{idx + 1}: 正则匹配成功")
                         matches.append((idx, mode_label, value))
-                except re.error:
-                    # 无效正则表达式，跳过
+                    else:
+                        print(f"字段{idx + 1}: 正则匹配失败")
+                except re.error as e:
+                    print(f"字段{idx + 1}: 正则表达式错误: {e}")
                     continue
 
+        print(f"=== 匹配检测完成，找到 {len(matches)} 个匹配 ===")
         return matches
 
     def _count_non_empty_saved_fields(self):
@@ -973,6 +1201,9 @@ class MainGUI:
 
         # 重新渲染保存显示区域
         self._reflow_saved_display()
+
+        # 保存配置到文件
+        self._save_config_to_file()
 
     def _clear_saved(self, index):
         """清除指定索引的保存字段
