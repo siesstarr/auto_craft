@@ -13,7 +13,7 @@ class TestFieldManagement:
 
     def test_field_creation(self, temp_config_dir):
         """测试字段创建功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -40,7 +40,7 @@ class TestFieldManagement:
 
     def test_field_removal(self, temp_config_dir):
         """测试字段删除功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -65,7 +65,7 @@ class TestFieldManagement:
 
     def test_field_validation(self, temp_config_dir):
         """测试字段验证功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -89,7 +89,7 @@ class TestFieldManagement:
 
     def test_field_save_workflow(self, temp_config_dir):
         """测试字段保存工作流程"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -117,7 +117,7 @@ class TestFieldManagement:
         self, temp_config_dir, monkeypatch
     ):
         """覆盖剪贴板轮询的空返回与异常分支"""
-        from man import MainGUI
+        from main import MainGUI
         from tests.test_utils import test_root
 
         if test_root is None:
@@ -142,7 +142,7 @@ class TestMatchingLogic:
 
     def test_text_matching(self, temp_config_dir):
         """测试文本匹配功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -179,7 +179,7 @@ class TestMatchingLogic:
 
     def test_regex_matching(self, temp_config_dir):
         """测试正则表达式匹配功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         from tests.test_utils import test_root
 
@@ -211,7 +211,7 @@ class TestMatchingLogic:
 
     def test_invalid_regex_handling(self, temp_config_dir):
         """测试无效正则表达式的处理"""
-        from man import MainGUI
+        from main import MainGUI
 
         from tests.test_utils import test_root
 
@@ -245,7 +245,7 @@ class TestUtilityFunctions:
 
     def test_mode_label_conversion(self, temp_config_dir):
         """测试模式标签转换"""
-        from man import MainGUI
+        from main import MainGUI
 
         from tests.test_utils import test_root
 
@@ -260,7 +260,7 @@ class TestUtilityFunctions:
 
     def test_text_processing(self, temp_config_dir):
         """测试文本处理功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         from tests.test_utils import test_root
 

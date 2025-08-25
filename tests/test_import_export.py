@@ -20,7 +20,7 @@ class TestImportFunctionality:
 
     def test_import_fields_success(self, temp_config_dir):
         """测试成功导入字段"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -68,7 +68,7 @@ class TestImportFunctionality:
 
     def test_import_fields_validation(self, temp_config_dir):
         """测试导入字段验证"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -98,7 +98,7 @@ class TestImportFunctionality:
 
     def test_import_fields_cancel(self, temp_config_dir):
         """测试导入取消操作"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -124,7 +124,7 @@ class TestExportFunctionality:
 
     def test_export_fields_success(self, temp_config_dir):
         """测试成功导出字段"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -161,7 +161,7 @@ class TestExportFunctionality:
 
     def test_export_fields_cancel(self, temp_config_dir):
         """测试导出取消操作"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -190,7 +190,7 @@ class TestImportExportIntegration:
 
     def test_import_export_roundtrip(self, temp_config_dir):
         """测试导入导出往返操作"""
-        from man import MainGUI
+        from main import MainGUI
 
         from tests.test_utils import test_root
 

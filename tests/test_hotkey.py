@@ -13,7 +13,7 @@ class TestHotkeyConfiguration:
 
     def test_hotkey_validation(self, temp_config_dir):
         """测试热键验证功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -39,7 +39,7 @@ class TestHotkeyConfiguration:
 
     def test_default_hotkeys_setting(self, temp_config_dir):
         """测试默认热键设置"""
-        from man import MainGUI, Config
+        from main import MainGUI, Config
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -73,7 +73,7 @@ class TestHotkeyConfiguration:
 
     def test_hotkey_config_loading(self, temp_config_dir):
         """测试热键配置加载"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -92,7 +92,7 @@ class TestHotkeyConfiguration:
 
     def test_hotkey_config_saving(self, temp_config_dir):
         """测试热键配置保存"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -129,7 +129,7 @@ class TestHotkeyRecording:
 
     def test_hotkey_recording_start(self, temp_config_dir):
         """测试热键录制开始"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -157,7 +157,7 @@ class TestHotkeyRecording:
 
     def test_hotkey_recording_cancel(self, temp_config_dir):
         """测试热键录制取消"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -187,7 +187,7 @@ class TestHotkeyRecording:
 
     def test_hotkey_recording_finish(self, temp_config_dir):
         """测试热键录制完成"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -221,7 +221,7 @@ class TestHotkeyRecording:
 
     def test_hotkey_recording_cleanup(self, temp_config_dir):
         """测试热键录制清理"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -255,7 +255,7 @@ class TestHotkeyIntegration:
 
     def test_hotkey_workflow(self, temp_config_dir):
         """测试热键完整工作流程"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -299,7 +299,7 @@ class TestHotkeyValidationEdge:
     """热键设置边界校验"""
 
     def test_hotkey_conflict_same_keys(self, temp_config_dir):
-        from man import MainGUI
+        from main import MainGUI
         from tests.test_utils import test_root
 
         if test_root is None:
@@ -316,7 +316,7 @@ class TestHotkeyValidationEdge:
         assert not (gui.start_hotkey == "F8" and gui.stop_hotkey == "F8")
 
     def test_hotkey_empty_invalid(self, temp_config_dir):
-        from man import MainGUI
+        from main import MainGUI
         from tests.test_utils import test_root
 
         if test_root is None:
@@ -338,7 +338,7 @@ class TestGlobalHotkeyListener:
     """覆盖pynput监听启动/停止和异常路径"""
 
     def test_start_and_stop_listener(self, temp_config_dir, monkeypatch):
-        from man import MainGUI
+        from main import MainGUI
         from tests.test_utils import test_root
 
         if test_root is None:
@@ -367,7 +367,7 @@ class TestGlobalHotkeyListener:
         assert not gui._hotkey_listening
 
     def test_listener_exception_path(self, temp_config_dir, monkeypatch):
-        from man import MainGUI
+        from main import MainGUI
         from tests.test_utils import test_root
 
         if test_root is None:

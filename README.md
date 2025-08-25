@@ -57,7 +57,7 @@
 
 ### 🚀 启动程序
 ```bash
-python man.py
+python main.py
 ```
 
 ### 📝 操作流程
@@ -185,7 +185,7 @@ pyinstaller --onefile --windowed --name ClipboardMatcher ^
   --hidden-import=tkinter ^
   --hidden-import=tkinter.ttk ^
   --hidden-import=tkinter.scrolledtext ^
-  man.py
+  main.py
 ```
 - 产物位于 `dist/ClipboardMatcher.exe`
 - 自定义图标：`--icon=app.ico`
@@ -196,7 +196,7 @@ pyinstaller --onefile --windowed --name ClipboardMatcher ^
 
 ### 🧪 运行测试
 ```bash
-python -m pytest test_man.py -v
+python -m pytest tests/ -v
 ```
 
 ### 📊 测试覆盖

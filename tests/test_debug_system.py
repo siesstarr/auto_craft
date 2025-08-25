@@ -13,7 +13,7 @@ class TestDebugSystem:
 
     def test_debug_system_initialization(self, temp_config_dir):
         """测试调试系统初始化"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -29,7 +29,7 @@ class TestDebugSystem:
 
     def test_debug_system_in_frozen_mode(self, temp_config_dir, monkeypatch):
         """测试打包态(sys.frozen)下的初始化分支"""
-        from man import MainGUI
+        from main import MainGUI
         from tests.test_utils import test_root
 
         if test_root is None:
@@ -43,7 +43,7 @@ class TestDebugSystem:
 
     def test_debug_print_functionality(self, temp_config_dir):
         """测试调试输出功能"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -61,7 +61,7 @@ class TestDebugSystem:
 
     def test_debug_mode_toggle(self, temp_config_dir):
         """测试调试模式切换功能"""
-        from man import MainGUI, Config
+        from main import MainGUI, Config
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -89,7 +89,7 @@ class TestDebugLogging:
 
     def test_debug_logging_levels(self, temp_config_dir):
         """测试不同级别的调试日志"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
@@ -112,7 +112,7 @@ class TestDebugLogging:
 
     def test_debug_logging_integration(self, temp_config_dir):
         """测试调试日志与业务逻辑的集成"""
-        from man import MainGUI
+        from main import MainGUI
 
         # 创建测试配置
         config_manager = ConfigManager(temp_config_dir)
