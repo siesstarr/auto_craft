@@ -336,17 +336,11 @@ class FieldsPanel:
         for child in self.saved_container.winfo_children():
             child.destroy()
 
-        # 为每个保存项创建显示和清除按钮
+        # 为每个保存项创建显示标签（只读显示）
         for idx, var in enumerate(self.field_manager.saved_display_vars):
             ttk.Label(self.saved_container, textvariable=var).grid(
-                row=idx, column=0, sticky=(tk.W, tk.E)
+                row=idx, column=0, sticky=(tk.W, tk.E), padx=(0, 8)
             )
-
-            ttk.Button(
-                self.saved_container,
-                text="清除",
-                command=lambda i=idx: self._handle_clear_saved(i),
-            ).grid(row=idx, column=1, sticky=tk.E, padx=(8, 0))
 
     def update_controls(self):
         """更新控制按钮状态"""
@@ -382,7 +376,6 @@ class FieldsPanel:
     def _handle_remove_field(self, index):
         """处理删除字段"""
         if self.field_manager.remove_field(index):
-            self._renumber_saved_display_vars()
             self.reflow_fields()
             self.reflow_saved_display()
             self.update_controls()
@@ -401,42 +394,6 @@ class FieldsPanel:
         """处理导出字段"""
         if self.on_export_fields:
             self.on_export_fields()
-
-    def _handle_clear_saved(self, index):
-        """处理清除保存字段"""
-        if 0 <= index < len(self.field_manager.fields):
-            # 清空输入框内容
-            self.field_manager.fields[index]["text"].set("")
-
-            # 更新保存显示
-            mode_label = self._get_mode_label(
-                self.field_manager.fields[index]["mode"].get()
-            )
-            self.field_manager.saved_display_vars[index].set(
-                f"字段{index + 1}（{mode_label}）: （空）"
-            )
-
-    def _renumber_saved_display_vars(self):
-        """重新编号保存字段显示变量"""
-        count = min(
-            len(self.field_manager.saved_display_vars),
-            len(self.field_manager.fields),
-        )
-
-        for i in range(count):
-            var = self.field_manager.saved_display_vars[i]
-            field = self.field_manager.fields[i]
-            mode_label = self._get_mode_label(field["mode"].get())
-
-            # 提取原有内容
-            old = var.get()
-            base = self._strip_match_suffix(old)
-            content = "（空）"
-            if ": " in base:
-                content = base.split(": ", 1)[1]
-
-            # 重新设置编号
-            var.set(f"字段{i + 1}（{mode_label}）: {content}")
 
         # 调整数组长度
         if len(self.field_manager.saved_display_vars) > len(

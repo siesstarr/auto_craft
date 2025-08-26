@@ -3,16 +3,7 @@
 """
 剪贴板内容匹配检测器 - 主程序入口
 
-重构说明：
-- 将原有的单一文件拆分为模块化架构
-- core.py: 核心业务逻辑（剪贴板监听、字段匹配、配置管理等）
-- ui.py: UI界面组件（字段面板、剪贴板面板、控制面板等）
-- main.py: 应用控制器和程序入口
-
-设计原则：
-- 业务逻辑与UI完全分离
-- 模块间通过清晰的接口交互
-- 保持原有功能不变，仅优化代码结构
+应用控制器：协调UI与业务逻辑
 """
 
 import tkinter as tk
@@ -37,13 +28,7 @@ from ui import MainWindow, FieldsPanel, ClipboardPanel, ControlPanel
 
 
 class ApplicationController:
-    """应用程序控制器
-
-    设计说明：
-    - 作为各个模块间的协调者
-    - 处理业务逻辑与UI的连接
-    - 管理应用程序的生命周期
-    """
+    """应用程序控制器：协调各模块间的交互"""
 
     def __init__(self, root):
         """初始化应用程序控制器"""
@@ -147,16 +132,7 @@ class ApplicationController:
                         {"text": text_var, "mode": mode_var}
                     )
 
-                    # 创建对应的保存显示变量
-                    mode_label = self._get_mode_label(mode_var.get())
-                    display_text = (
-                        field_data['text'] if field_data['text'] else '（空）'
-                    )
-                    self.field_manager.saved_display_vars.append(
-                        tk.StringVar(
-                            value=f"字段{len(self.field_manager.fields)}（{mode_label}）: {display_text}"  # noqa: E501
-                        )
-                    )
+                    # 注意：不再自动创建保存显示变量，保存内容独立于字段配置
 
         # 如果没有字段，至少添加一个
         if not self.field_manager.fields:
@@ -208,17 +184,8 @@ class ApplicationController:
                     messagebox.showwarning("提示", f"字段{i} 的正则无效: {e}")
                     return
 
-        # 确保保存显示变量数量正确
-        if len(self.field_manager.saved_display_vars) != len(
-            self.field_manager.fields
-        ):
-            DebugSystem.debug_print(
-                f"调整保存显示变量数量: {len(self.field_manager.saved_display_vars)} -> {len(self.field_manager.fields)}",  # noqa: E501
-                logging.DEBUG,
-            )
-            self.field_manager.saved_display_vars = [
-                tk.StringVar() for _ in range(len(self.field_manager.fields))
-            ]
+        # 清空保存显示变量，完整复制当前字段状态
+        self.field_manager.saved_display_vars.clear()
 
         # 保存所有字段
         saved_count = 0
@@ -227,9 +194,12 @@ class ApplicationController:
             mode_label = self._get_mode_label(field["mode"].get())
             text = value if value else "（空）"
 
-            self.field_manager.saved_display_vars[idx - 1].set(
-                f"字段{idx}（{mode_label}）: {text}"
+            # 创建新的保存显示变量
+            saved_var = tk.StringVar(
+                value=f"字段{idx}（{mode_label}）: {text}"
             )
+            self.field_manager.saved_display_vars.append(saved_var)
+
             if value:
                 saved_count += 1
 
@@ -307,16 +277,7 @@ class ApplicationController:
                         {"text": text_var, "mode": mode_var}
                     )
 
-                    # 创建对应的保存显示变量
-                    mode_label = self._get_mode_label(mode_var.get())
-                    display_text = (
-                        field_data['text'] if field_data['text'] else '（空）'
-                    )
-                    self.field_manager.saved_display_vars.append(
-                        tk.StringVar(
-                            value=f"字段{len(self.field_manager.fields)}（{mode_label}）: {display_text}"  # noqa: E501
-                        )
-                    )
+                    # 注意：不再自动创建保存显示变量，保存内容独立于字段配置
                     imported_count += 1
 
             DebugSystem.debug_print(

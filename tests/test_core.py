@@ -3,7 +3,6 @@
 测试字段管理、匹配逻辑等核心功能
 """
 
-import re
 import pytest
 import tkinter as tk
 from core import (
@@ -25,7 +24,6 @@ class TestFieldManager:
         """测试字段创建功能"""
         field_manager = FieldManager()
 
-        # 测试添加字段
         initial_count = field_manager.get_field_count()
         text_var = tk.StringVar()
         mode_var = tk.StringVar(value="text")
@@ -391,9 +389,6 @@ class TestIntegration:
 
     def test_config_manager_error_handling(self):
         """测试配置管理器错误处理"""
-        import os
-        import tempfile
-
         # 测试加载不存在的配置文件
         fields_data = ConfigManager.load_fields_config()
         assert isinstance(fields_data, list)

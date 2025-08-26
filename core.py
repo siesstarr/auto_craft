@@ -159,14 +159,6 @@ class FieldManager:
         field_data = {"text": text_var, "mode": mode_var}
         self.fields.append(field_data)
 
-        # 创建对应的保存显示变量
-        mode_label = self._get_mode_label(mode_var.get())
-        self.saved_display_vars.append(
-            tk.StringVar(
-                value=f"字段{len(self.fields)}（{mode_label}）: （空）"
-            )
-        )
-
         DebugSystem.debug_print(
             f"字段添加成功，当前字段数量: {len(self.fields)}",
             logging.INFO,
@@ -185,10 +177,6 @@ class FieldManager:
         if 0 <= index < len(self.fields):
             # 删除字段数据
             del self.fields[index]
-
-            # 删除对应的保存显示变量
-            if 0 <= index < len(self.saved_display_vars):
-                del self.saved_display_vars[index]
 
             DebugSystem.debug_print(
                 f"字段删除成功，当前字段数量: {len(self.fields)}",

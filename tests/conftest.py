@@ -7,7 +7,6 @@ import pytest
 import shutil
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock
 
 
 @pytest.fixture(scope="session")
@@ -52,7 +51,6 @@ def setup_test_environment(temp_config_dir, monkeypatch):
 
     yield
 
-    # 测试结束后清理
     for config_file in [
         Path(temp_config_dir) / "fields_config.json",
         Path(temp_config_dir) / "hotkey_config.json",

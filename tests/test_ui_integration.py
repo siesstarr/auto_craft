@@ -3,7 +3,6 @@ UI集成测试
 测试主应用程序和UI组件的基本初始化和集成
 """
 
-import pytest
 import tkinter as tk
 from main import ApplicationController
 
@@ -39,16 +38,9 @@ class TestApplicationIntegration:
         try:
             app = ApplicationController(root)
 
-            # 测试字段管理基本功能
-            initial_count = app.field_manager.get_field_count()
-
             # 通过控制器添加字段应该是可能的
             assert app.field_manager.can_add_field() is True
-
-            # 测试匹配引擎基本功能
             assert app.match_engine is not None
-
-            # 测试剪贴板管理器基本状态
             assert not app.clipboard_manager.is_listening()
 
         finally:
@@ -76,10 +68,7 @@ class TestApplicationIntegration:
         try:
             app = ApplicationController(root)
 
-            # 测试UI组件是否正确连接到root
             assert app.main_window.root == root
-
-            # 测试字段面板是否有字段管理器引用
             assert app.fields_panel.field_manager == app.field_manager
 
         finally:
